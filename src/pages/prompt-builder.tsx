@@ -19,7 +19,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight,
@@ -33,6 +32,7 @@ import {
   Image as ImageIcon,
   Video,
   Zap,
+  WandSparkles,
 } from "lucide-react";
 import { promptCollections as initialPromptCollections } from "@/data/promptData";
 import {
@@ -53,10 +53,31 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+interface PromptCollection {
+  id: number;
+  name: string;
+  icon: string;
+  model: string;
+  createdDate: string;
+  lastModified: string;
+  variations: {
+    name: string;
+    versions: {
+      id: number;
+      note: string;
+      prompt: string;
+      output: { type: string; content: string };
+      date: string;
+      promptTokens: number;
+      outputTokens: number;
+    }[];
+  }[];
+}
+
 export default function PromptBuilder() {
-  const [promptCollections, setPromptCollections] = useState(
-    initialPromptCollections
-  );
+  const [promptCollections, setPromptCollections] = useState<
+    PromptCollection[]
+  >(initialPromptCollections);
   const [selectedCollectionId, setSelectedCollectionId] = useState(
     promptCollections[0].id.toString()
   );
@@ -128,10 +149,14 @@ export default function PromptBuilder() {
 
   const handleCreateNewCollection = useCallback(() => {
     if (newCollectionName && newCollectionIcon) {
-      const newCollection = {
+      const currentDate = new Date().toISOString().split("T")[0];
+      const newCollection: PromptCollection = {
         id: promptCollections.length + 1,
         name: newCollectionName,
         icon: newCollectionIcon,
+        model: "GPT-4", // Default model
+        createdDate: currentDate,
+        lastModified: currentDate,
         variations: [
           {
             name: "main",
@@ -141,7 +166,7 @@ export default function PromptBuilder() {
                 note: "Initial version",
                 prompt: "",
                 output: { type: "text", content: "" },
-                date: new Date().toISOString().split("T")[0],
+                date: currentDate,
                 promptTokens: 0,
                 outputTokens: 0,
               },
@@ -456,7 +481,8 @@ export default function PromptBuilder() {
                     {selectedCollection.name}
                   </h2>
                   <div className="flex items-center text-lg text-gray-600">
-                    <Zap className="mr-2 h-5 w-5" />
+                    <WandSparkles className="mr-2 h-5 w-5" />
+
                     <span>{selectedCollection.model || "Not specified"}</span>
                   </div>
                 </div>
