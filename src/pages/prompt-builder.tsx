@@ -22,12 +22,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   ChevronRight,
   History,
   Plus,
@@ -52,6 +46,12 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function PromptBuilder() {
   const [promptCollections, setPromptCollections] = useState(
@@ -434,7 +434,7 @@ export default function PromptBuilder() {
                       <span className="font-medium text-gray-800">
                         V{version.id}
                       </span>
-                      <span className="text-xs text-gray-500 flex items-center">
+                      <span className="text-xs  text-gray-500 flex items-center">
                         <Calendar className="mr-1 h-3 w-3" />
                         {version.date}
                       </span>
@@ -448,6 +448,21 @@ export default function PromptBuilder() {
           </div>
           {/* Prompt and Output */}
           <div className="flex-1 p-4 overflow-auto">
+            {/* Collection Details Section */}
+            <Card className="mb-4 shadow-md">
+              <CardContent className="py-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-semibold text-gray-800">
+                    {selectedCollection.name}
+                  </h2>
+                  <div className="flex items-center text-lg text-gray-600">
+                    <Zap className="mr-2 h-5 w-5" />
+                    <span>{selectedCollection.model || "Not specified"}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="mb-4 shadow-md">
               <CardHeader className="border-b border-gray-200">
                 <div className="flex justify-between items-center">
