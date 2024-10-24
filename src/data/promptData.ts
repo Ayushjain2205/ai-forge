@@ -3,6 +3,9 @@ export const promptCollections = [
     id: 1,
     name: "Story Generator",
     icon: "📚",
+    model: "GPT-4",
+    createdDate: "2023-05-01",
+    lastModified: "2023-05-05",
     variations: [
       {
         name: "main",
@@ -84,6 +87,9 @@ export const promptCollections = [
     id: 2,
     name: "Image Generator",
     icon: "🖼️",
+    model: "DALL-E 2",
+    createdDate: "2023-05-06",
+    lastModified: "2023-05-06",
     variations: [
       {
         name: "main",
@@ -108,6 +114,9 @@ export const promptCollections = [
     id: 3,
     name: "Video Creator",
     icon: "🎥",
+    model: "Runway ML",
+    createdDate: "2023-05-07",
+    lastModified: "2023-05-07",
     variations: [
       {
         name: "main",
