@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,8 @@ export default function PromptBuilder() {
     useState(false);
   const [isNewVariationDialogOpen, setIsNewVariationDialogOpen] =
     useState(false);
+  const [editedPrompt, setEditedPrompt] = useState("");
+  const [newVersionNote, setNewVersionNote] = useState("");
 
   const selectedCollection = useMemo(
     () =>
@@ -69,6 +71,12 @@ export default function PromptBuilder() {
     () => selectedVariation?.versions.find((v) => v.id === selectedVersionId),
     [selectedVariation, selectedVersionId]
   );
+
+  useEffect(() => {
+    if (selectedVersion) {
+      setEditedPrompt(selectedVersion.prompt);
+    }
+  }, [selectedVersion]);
 
   const handleCollectionSelect = useCallback(
     (collectionId: string) => {
@@ -165,6 +173,53 @@ export default function PromptBuilder() {
     newVariationName,
     selectedCollection,
     selectedCollectionId,
+    promptCollections,
+  ]);
+
+  const handleSaveNewVersion = useCallback(() => {
+    if (
+      editedPrompt &&
+      newVersionNote &&
+      selectedCollection &&
+      selectedVariation
+    ) {
+      const newVersion = {
+        id: selectedVariation.versions.length + 1,
+        note: newVersionNote,
+        prompt: editedPrompt,
+        output: { type: "text", content: "New output will be generated here." },
+        date: new Date().toISOString().split("T")[0],
+        promptTokens: editedPrompt.split(" ").length, // Simple token count
+        outputTokens: 0,
+      };
+      const updatedCollections = promptCollections.map((collection) => {
+        if (collection.id.toString() === selectedCollectionId) {
+          return {
+            ...collection,
+            variations: collection.variations.map((variation) => {
+              if (variation.name === selectedVariationName) {
+                return {
+                  ...variation,
+                  versions: [...variation.versions, newVersion],
+                };
+              }
+              return variation;
+            }),
+          };
+        }
+        return collection;
+      });
+      setPromptCollections(updatedCollections);
+      setSelectedVersionId(newVersion.id);
+      setNewVersionNote("");
+    }
+  }, [
+    editedPrompt,
+    newVersionNote,
+    selectedCollection,
+    selectedVariation,
+    selectedCollectionId,
+    selectedVariationName,
     promptCollections,
   ]);
 
@@ -371,12 +426,14 @@ export default function PromptBuilder() {
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="bg-gray-100 p-4 rounded-md mb-4">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  <h3 className="text-sm  font-semibold text-gray-700 mb-2">
                     Input Prompt:
                   </h3>
-                  <p className="text-gray-800 whitespace-pre-wrap">
-                    {selectedVersion.prompt}
-                  </p>
+                  <Textarea
+                    value={editedPrompt}
+                    onChange={(e) => setEditedPrompt(e.target.value)}
+                    className="min-h-[100px] w-full border-gray-300 focus:border-[#FF6B2C] focus:ring-[#FF6B2C]"
+                  />
                 </div>
                 <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
                   <div>
@@ -390,8 +447,16 @@ export default function PromptBuilder() {
                 </div>
                 <Separator className="my-4" />
                 <div className="flex justify-between">
-                  <Input placeholder="Version note" className="w-2/3 mr-2" />
-                  <Button className="w-1/3 bg-[#FF6B2C] hover:bg-[#E55A1B] text-white">
+                  <Input
+                    placeholder="Version note"
+                    className="w-2/3 mr-2"
+                    value={newVersionNote}
+                    onChange={(e) => setNewVersionNote(e.target.value)}
+                  />
+                  <Button
+                    className="w-1/3 bg-[#FF6B2C] hover:bg-[#E55A1B] text-white"
+                    onClick={handleSaveNewVersion}
+                  >
                     <Save className="mr-2 h-4 w-4" /> Save New Version
                   </Button>
                 </div>
