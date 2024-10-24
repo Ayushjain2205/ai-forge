@@ -51,6 +51,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PromptBuilder() {
   const [promptCollections, setPromptCollections] = useState(
@@ -462,26 +463,36 @@ export default function PromptBuilder() {
                 <CardDescription>{selectedVersion.note}</CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="bg-gray-100 p-4 rounded-md mb-4">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Input Prompt:
-                  </h3>
-                  <Textarea
-                    value={editedPrompt}
-                    onChange={(e) => setEditedPrompt(e.target.value)}
-                    className="min-h-[100px] w-full border-gray-300 focus:border-[#FF6B2C] focus:ring-[#FF6B2C]"
-                  />
-                </div>
-                <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
-                  <div>
-                    <span className="font-medium flex items-center">
-                      <Zap className="mr-1 h-4 w-4" />
-                      Prompt Tokens:
-                    </span>{" "}
-                    {selectedVersion.promptTokens}
-                  </div>
-                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedVersion.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-gray-100 p-4 rounded-md mb-4">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Input Prompt:
+                      </h3>
+                      <Textarea
+                        value={editedPrompt}
+                        onChange={(e) => setEditedPrompt(e.target.value)}
+                        className="min-h-[100px] w-full border-gray-300 focus:border-[#FF6B2C] focus:ring-[#FF6B2C]"
+                      />
+                    </div>
+                    <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+                      <div>
+                        <span className="font-medium flex items-center">
+                          <Zap className="mr-1 h-4 w-4" />
+                          Prompt Tokens:
+                        </span>{" "}
+                        {selectedVersion.promptTokens}
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </CardContent>
               <CardFooter className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between items-center w-full">
@@ -508,62 +519,72 @@ export default function PromptBuilder() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="bg-white border border-gray-200 rounded-md p-4 mb-4">
-                  {selectedVersion.output.type === "text" && (
-                    <div className="flex items-start">
-                      <MessageSquare className="mr-2 h-5 w-5 text-gray-500 mt-1" />
-                      <p className="text-gray-800 whitespace-pre-wrap flex-grow">
-                        {selectedVersion.output.content}
-                      </p>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedVersion.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-white border border-gray-200 rounded-md p-4 mb-4">
+                      {selectedVersion.output.type === "text" && (
+                        <div className="flex items-start">
+                          <MessageSquare className="mr-2 h-5 w-5 text-gray-500 mt-1" />
+                          <p className="text-gray-800 whitespace-pre-wrap flex-grow">
+                            {selectedVersion.output.content}
+                          </p>
+                        </div>
+                      )}
+                      {selectedVersion.output.type === "image" && (
+                        <div className="flex flex-col items-center">
+                          <ImageIcon className="mb-2 h-8 w-8 text-gray-500" />
+                          <img
+                            src={selectedVersion.output.content}
+                            alt="Generated image"
+                            className="max-w-full h-auto rounded-md"
+                          />
+                        </div>
+                      )}
+                      {selectedVersion.output.type === "video" && (
+                        <div className="flex flex-col items-center">
+                          <Video className="mb-2 h-8 w-8 text-gray-500" />
+                          <video controls className="w-full rounded-md">
+                            <source
+                              src={selectedVersion.output.content}
+                              type="video/mp4"
+                            />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {selectedVersion.output.type === "image" && (
-                    <div className="flex flex-col items-center">
-                      <ImageIcon className="mb-2 h-8 w-8 text-gray-500" />
-                      <img
-                        src={selectedVersion.output.content}
-                        alt="Generated image"
-                        className="max-w-full h-auto rounded-md"
-                      />
+                    <div className="flex justify-between items-center text-sm text-gray-600">
+                      <div>
+                        <span className="font-medium flex items-center">
+                          <Zap className="mr-1 h-4 w-4" />
+                          Output Type:
+                        </span>{" "}
+                        {selectedVersion.output.type}
+                      </div>
+                      <div>
+                        <span className="font-medium flex items-center">
+                          <Zap className="mr-1 h-4 w-4" />
+                          Output Tokens:
+                        </span>{" "}
+                        {selectedVersion.outputTokens}
+                      </div>
+                      <div>
+                        <span className="font-medium flex items-center">
+                          <Zap className="mr-1 h-4 w-4" />
+                          Total Tokens:
+                        </span>{" "}
+                        {selectedVersion.promptTokens +
+                          selectedVersion.outputTokens}
+                      </div>
                     </div>
-                  )}
-                  {selectedVersion.output.type === "video" && (
-                    <div className="flex flex-col items-center">
-                      <Video className="mb-2 h-8 w-8 text-gray-500" />
-                      <video controls className="w-full rounded-md">
-                        <source
-                          src={selectedVersion.output.content}
-                          type="video/mp4"
-                        />
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  )}
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <div>
-                    <span className="font-medium flex items-center">
-                      <Zap className="mr-1 h-4 w-4" />
-                      Output Type:
-                    </span>{" "}
-                    {selectedVersion.output.type}
-                  </div>
-                  <div>
-                    <span className="font-medium flex items-center">
-                      <Zap className="mr-1 h-4 w-4" />
-                      Output Tokens:
-                    </span>{" "}
-                    {selectedVersion.outputTokens}
-                  </div>
-                  <div>
-                    <span className="font-medium flex items-center">
-                      <Zap className="mr-1 h-4 w-4" />
-                      Total Tokens:
-                    </span>{" "}
-                    {selectedVersion.promptTokens +
-                      selectedVersion.outputTokens}
-                  </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               </CardContent>
             </Card>
           </div>
