@@ -3,6 +3,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -10,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -18,178 +18,245 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { GitBranch, History, MessageSquare, Plus, Share2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronRight, History, Plus, Save, Undo } from "lucide-react";
+
+// Dummy data structure for prompt collections
+const dummyPromptCollections = [
+  {
+    id: 1,
+    name: "Story Generator",
+    variations: [
+      {
+        name: "main",
+        versions: [
+          {
+            id: 1,
+            note: "Initial version",
+            prompt: "Write a short story about {character} in {setting}",
+            output: "Once upon a time, in a bustling city...",
+          },
+          {
+            id: 2,
+            note: "Improved character description",
+            prompt:
+              "Create a vivid tale featuring {character} with {trait} embarking on an adventure in {setting}",
+            output:
+              "In the heart of a vibrant metropolis, a determined young woman...",
+          },
+        ],
+      },
+      {
+        name: "experimental",
+        versions: [
+          {
+            id: 1,
+            note: "Initial version",
+            prompt: "Write a short story about {character} in {setting}",
+            output: "Once upon a time, in a bustling city...",
+          },
+          {
+            id: 3,
+            note: "Added genre parameter",
+            prompt: "Write a {genre} story about {character} in {setting}",
+            output: "The neon-lit streets of Neo Tokyo buzzed with...",
+          },
+        ],
+      },
+    ],
+  },
+  // ... other prompt collections
+];
 
 export default function PromptBuilder() {
-  const [promptText, setPromptText] = useState(
-    "Generate a creative story about {character} in {setting}."
+  const [selectedCollection, setSelectedCollection] = useState(
+    dummyPromptCollections[0]
   );
+  const [selectedVariation, setSelectedVariation] = useState(
+    selectedCollection.variations[0]
+  );
+  const [selectedVersion, setSelectedVersion] = useState(
+    selectedVariation.versions[selectedVariation.versions.length - 1]
+  );
+
+  const handleCollectionSelect = (collection) => {
+    setSelectedCollection(collection);
+    setSelectedVariation(collection.variations[0]);
+    setSelectedVersion(
+      collection.variations[0].versions[
+        collection.variations[0].versions.length - 1
+      ]
+    );
+  };
+
+  const handleVariationSelect = (variation) => {
+    setSelectedVariation(variation);
+    setSelectedVersion(variation.versions[variation.versions.length - 1]);
+  };
+
+  const handleVersionSelect = (version) => {
+    setSelectedVersion(version);
+  };
 
   return (
     <Layout>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Visual Prompt Builder */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-              Visual Prompt Builder
-            </CardTitle>
-            <CardDescription>
-              Create and edit prompts with parameter highlighting
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={promptText}
-              onChange={(e) => setPromptText(e.target.value)}
-              className="min-h-[200px] mb-4 border-gray-300 focus:border-[#FF6B2C] focus:ring-[#FF6B2C] font-normal"
-            />
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#FF6B2C] text-[#FF6B2C] hover:bg-[#FF6B2C] hover:text-white font-medium"
+      <div className="flex h-[calc(100vh-4rem)]">
+        {/* Sidebar */}
+        <div className="w-64 border-r border-gray-200 bg-gray-50">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Prompt Collections</h2>
+            <Button className="w-full mb-4">
+              <Plus className="mr-2 h-4 w-4" /> New Collection
+            </Button>
+            <ScrollArea className="h-[calc(100vh-12rem)]">
+              {dummyPromptCollections.map((collection) => (
+                <div
+                  key={collection.id}
+                  className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                    selectedCollection.id === collection.id ? "bg-gray-200" : ""
+                  }`}
+                  onClick={() => handleCollectionSelect(collection)}
+                >
+                  <div className="flex items-center">
+                    <ChevronRight className="mr-2 h-4 w-4" />
+                    <span>{collection.name}</span>
+                  </div>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 border-b border-gray-200">
+            <h1 className="text-2xl font-bold text-[#FF6B2C]">
+              {selectedCollection.name}
+            </h1>
+            <div className="flex mt-4 space-x-4">
+              <Select
+                value={selectedVariation.name}
+                onValueChange={(value) =>
+                  handleVariationSelect(
+                    selectedCollection.variations.find((v) => v.name === value)
+                  )
+                }
               >
-                <Plus className="mr-2 h-4 w-4" /> Add Parameter
-              </Button>
-              <Select>
-                <SelectTrigger className="w-[180px] border-gray-300">
-                  <SelectValue placeholder="Select model" />
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select variation" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt3">GPT-3</SelectItem>
-                  <SelectItem value="gpt4">GPT-4</SelectItem>
-                  <SelectItem value="claude">Claude</SelectItem>
+                  {selectedCollection.variations.map((variation) => (
+                    <SelectItem key={variation.name} value={variation.name}>
+                      {variation.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Prompt Templates */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-              Prompt Templates
-            </CardTitle>
-            <CardDescription>
-              Browse and select from pre-defined templates
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-2">
-                {[
-                  "Story Generator",
-                  "Code Explainer",
-                  "Data Analyzer",
-                  "Image Describer",
-                ].map((template) => (
-                  <div
-                    key={template}
-                    className="flex items-center justify-between p-2 hover:bg-gray-100 rounded"
-                  >
-                    <span className="font-medium">{template}</span>
-                    <Badge className="bg-[#2D3BE0] text-white font-normal">
-                      AI
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Version Control */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-              Version Control
-            </CardTitle>
-            <CardDescription>
-              Manage prompt versions and history
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="flex items-center text-[#2A2D3E] font-medium">
-                  <GitBranch className="mr-2 h-4 w-4" /> main
-                </span>
-                <Badge
-                  variant="outline"
-                  className="border-[#2D3BE0] text-[#2D3BE0] font-normal"
-                >
-                  Latest
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between text-gray-500">
-                <span className="flex items-center font-medium">
-                  <GitBranch className="mr-2 h-4 w-4" /> feature/new-params
-                </span>
-                <span className="text-xs">2 days ago</span>
-              </div>
-            </div>
-            <div className="mt-4 flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#FF6B2C] text-[#FF6B2C] hover:bg-[#FF6B2C] hover:text-white font-medium"
-              >
-                <History className="mr-2 h-4 w-4" /> History
+              <Button variant="outline">
+                <Plus className="mr-2 h-4 w-4" /> New Variation
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#FF6B2C] text-[#FF6B2C] hover:bg-[#FF6B2C] hover:text-white font-medium"
-              >
-                <GitBranch className="mr-2 h-4 w-4" /> Branch
+              <Button variant="outline">
+                <Undo className="mr-2 h-4 w-4" /> Rollback
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Collaborative Features */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-              Collaboration
-            </CardTitle>
-            <CardDescription>Work together in real-time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2 mb-4">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder-avatar.jpg" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder-avatar-2.jpg" />
-                <AvatarFallback>AS</AvatarFallback>
-              </Avatar>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full border-[#FF6B2C] text-[#FF6B2C] hover:bg-[#FF6B2C] hover:text-white"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+          </div>
+          <div className="flex-1 flex">
+            <div className="w-1/2 p-4 border-r border-gray-200">
+              <Tabs defaultValue="edit" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="edit">Edit</TabsTrigger>
+                  <TabsTrigger value="history">History</TabsTrigger>
+                </TabsList>
+                <TabsContent value="edit">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
+                        Prompt Editor
+                      </CardTitle>
+                      <CardDescription>
+                        Edit your prompt and save a new version
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Textarea
+                        value={selectedVersion.prompt}
+                        onChange={() => {}}
+                        className="min-h-[200px] mb-4"
+                      />
+                      <Input placeholder="Version note" className="mb-4" />
+                      <Button className="w-full">
+                        <Save className="mr-2 h-4 w-4" /> Save New Version
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="history">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
+                        Version History
+                      </CardTitle>
+                      <CardDescription>
+                        View and select previous versions
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[300px]">
+                        {selectedVariation.versions
+                          .slice()
+                          .reverse()
+                          .map((version) => (
+                            <div
+                              key={version.id}
+                              className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                                selectedVersion.id === version.id
+                                  ? "bg-gray-200"
+                                  : ""
+                              }`}
+                              onClick={() => handleVersionSelect(version)}
+                            >
+                              <div className="flex items-center mb-2">
+                                <History className="mr-2 h-4 w-4" />
+                                <span className="font-medium">
+                                  Version {version.id}: {version.note}
+                                </span>
+                              </div>
+                              <div className="text-sm text-gray-600 mb-1">
+                                Prompt: {version.prompt}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Output: {version.output.substring(0, 50)}...
+                              </div>
+                            </div>
+                          ))}
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
-            <div className="space-y-2">
-              <Button className="w-full bg-[#2D3BE0] hover:bg-[#3D4BE0] text-white font-medium">
-                <MessageSquare className="mr-2 h-4 w-4" /> Open Chat
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border-[#2D3BE0] text-[#2D3BE0] hover:bg-[#2D3BE0] hover:text-white font-medium"
-              >
-                <Share2 className="mr-2 h-4 w-4" /> Share Prompt
-              </Button>
+            <div className="w-1/2 p-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
+                    Output
+                  </CardTitle>
+                  <CardDescription>
+                    View the generated output for this prompt version
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={selectedVersion.output}
+                    readOnly
+                    className="min-h-[200px]"
+                  />
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </Layout>
   );
