@@ -20,135 +20,22 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ChevronRight, History, Plus, Save, Undo } from "lucide-react";
-
-// Dummy data structure for prompt collections
-const dummyPromptCollections = [
-  {
-    id: 1,
-    name: "Story Generator",
-    icon: "📚",
-    variations: [
-      {
-        name: "main",
-        versions: [
-          {
-            id: 1,
-            note: "Initial version",
-            prompt: "Write a short story about {character} in {setting}",
-            output: "Once upon a time, in a bustling city...",
-            date: "2023-05-01",
-            promptTokens: 10,
-            outputTokens: 50,
-          },
-          {
-            id: 2,
-            note: "Improved character description",
-            prompt:
-              "Create a vivid tale featuring {character} with {trait} embarking on an adventure in {setting}",
-            output:
-              "In the heart of a vibrant metropolis, a determined young woman...",
-            date: "2023-05-03",
-            promptTokens: 15,
-            outputTokens: 60,
-          },
-          {
-            id: 3,
-            note: "Added conflict element",
-            prompt:
-              "Write an engaging story about {character} with {trait} facing {conflict} in {setting}",
-            output:
-              "The sun was setting over the ancient ruins when Sarah, a brilliant archaeologist with an insatiable curiosity, stumbled upon a mysterious artifact...",
-            date: "2023-05-05",
-            promptTokens: 18,
-            outputTokens: 70,
-          },
-        ],
-      },
-      {
-        name: "experimental",
-        versions: [
-          {
-            id: 1,
-            note: "Initial version",
-            prompt: "Write a short story about {character} in {setting}",
-            output: "Once upon a time, in a bustling city...",
-            date: "2023-05-02",
-            promptTokens: 10,
-            outputTokens: 50,
-          },
-          {
-            id: 2,
-            note: "Added genre parameter",
-            prompt: "Write a {genre} story about {character} in {setting}",
-            output: "The neon-lit streets of Neo Tokyo buzzed with...",
-            date: "2023-05-04",
-            promptTokens: 12,
-            outputTokens: 55,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Code Explainer",
-    icon: "💻",
-    variations: [
-      {
-        name: "main",
-        versions: [
-          {
-            id: 1,
-            note: "Initial version",
-            prompt: "Explain the following code: {code}",
-            output: "This code is a function that...",
-            date: "2023-05-06",
-            promptTokens: 8,
-            outputTokens: 40,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Data Analyzer",
-    icon: "📊",
-    variations: [
-      {
-        name: "main",
-        versions: [
-          {
-            id: 1,
-            note: "Initial version",
-            prompt: "Analyze the following data: {data}",
-            output: "Based on the provided data, we can observe...",
-            date: "2023-05-07",
-            promptTokens: 9,
-            outputTokens: 45,
-          },
-        ],
-      },
-    ],
-  },
-];
+import { promptCollections } from "@/data/promptData";
 
 export default function PromptBuilder() {
   const [selectedCollectionId, setSelectedCollectionId] = useState(
-    dummyPromptCollections[0].id.toString()
+    promptCollections[0].id.toString()
   );
   const [selectedVariationName, setSelectedVariationName] = useState(
-    dummyPromptCollections[0].variations[0].name
+    promptCollections[0].variations[0].name
   );
   const [selectedVersionId, setSelectedVersionId] = useState(
-    dummyPromptCollections[0].variations[0].versions[0].id
+    promptCollections[0].variations[0].versions[0].id
   );
 
   const selectedCollection = useMemo(
     () =>
-      dummyPromptCollections.find(
-        (c) => c.id.toString() === selectedCollectionId
-      ),
+      promptCollections.find((c) => c.id.toString() === selectedCollectionId),
     [selectedCollectionId]
   );
   const selectedVariation = useMemo(
@@ -165,7 +52,7 @@ export default function PromptBuilder() {
 
   const handleCollectionSelect = useCallback((collectionId: string) => {
     setSelectedCollectionId(collectionId);
-    const newCollection = dummyPromptCollections.find(
+    const newCollection = promptCollections.find(
       (c) => c.id.toString() === collectionId
     );
     if (newCollection) {
@@ -214,7 +101,7 @@ export default function PromptBuilder() {
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {dummyPromptCollections.map((collection) => (
+                {promptCollections.map((collection) => (
                   <SelectItem
                     key={collection.id}
                     value={collection.id.toString()}
@@ -312,11 +199,14 @@ export default function PromptBuilder() {
                 <CardDescription>{selectedVersion.note}</CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
-                <Textarea
-                  value={selectedVersion.prompt}
-                  onChange={() => {}}
-                  className="min-h-[100px] mb-4 border-gray-300 focus:border-[#FF6B2C] focus:ring-[#FF6B2C]"
-                />
+                <div className="bg-gray-100 p-4 rounded-md mb-4">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                    Input Prompt:
+                  </h3>
+                  <p className="text-gray-800 whitespace-pre-wrap">
+                    {selectedVersion.prompt}
+                  </p>
+                </div>
                 <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
                   <div>
                     <span className="font-medium">Date:</span>{" "}
@@ -344,12 +234,34 @@ export default function PromptBuilder() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <Textarea
-                  value={selectedVersion.output}
-                  readOnly
-                  className="min-h-[200px] mb-4 bg-gray-50 border-gray-300"
-                />
+                <div className="bg-white border border-gray-200 rounded-md p-4 mb-4">
+                  {selectedVersion.output.type === "text" && (
+                    <p className="text-gray-800 whitespace-pre-wrap">
+                      {selectedVersion.output.content}
+                    </p>
+                  )}
+                  {selectedVersion.output.type === "image" && (
+                    <img
+                      src={selectedVersion.output.content}
+                      alt="Generated image"
+                      className="max-w-full h-auto rounded-md"
+                    />
+                  )}
+                  {selectedVersion.output.type === "video" && (
+                    <video controls className="w-full rounded-md">
+                      <source
+                        src={selectedVersion.output.content}
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+                </div>
                 <div className="flex justify-between items-center text-sm text-gray-600">
+                  <div>
+                    <span className="font-medium">Output Type:</span>{" "}
+                    {selectedVersion.output.type}
+                  </div>
                   <div>
                     <span className="font-medium">Output Tokens:</span>{" "}
                     {selectedVersion.outputTokens}
