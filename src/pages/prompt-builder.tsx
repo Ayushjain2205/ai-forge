@@ -20,9 +20,22 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ChevronRight, History, Plus, Save, Undo } from "lucide-react";
-import { promptCollections } from "@/data/promptData";
+import { promptCollections as initialPromptCollections } from "@/data/promptData";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function PromptBuilder() {
+  const [promptCollections, setPromptCollections] = useState(
+    initialPromptCollections
+  );
   const [selectedCollectionId, setSelectedCollectionId] = useState(
     promptCollections[0].id.toString()
   );
@@ -32,11 +45,18 @@ export default function PromptBuilder() {
   const [selectedVersionId, setSelectedVersionId] = useState(
     promptCollections[0].variations[0].versions[0].id
   );
+  const [newCollectionName, setNewCollectionName] = useState("");
+  const [newCollectionIcon, setNewCollectionIcon] = useState("");
+  const [newVariationName, setNewVariationName] = useState("");
+  const [isNewCollectionDialogOpen, setIsNewCollectionDialogOpen] =
+    useState(false);
+  const [isNewVariationDialogOpen, setIsNewVariationDialogOpen] =
+    useState(false);
 
   const selectedCollection = useMemo(
     () =>
       promptCollections.find((c) => c.id.toString() === selectedCollectionId),
-    [selectedCollectionId]
+    [promptCollections, selectedCollectionId]
   );
   const selectedVariation = useMemo(
     () =>
@@ -50,16 +70,19 @@ export default function PromptBuilder() {
     [selectedVariation, selectedVersionId]
   );
 
-  const handleCollectionSelect = useCallback((collectionId: string) => {
-    setSelectedCollectionId(collectionId);
-    const newCollection = promptCollections.find(
-      (c) => c.id.toString() === collectionId
-    );
-    if (newCollection) {
-      setSelectedVariationName(newCollection.variations[0].name);
-      setSelectedVersionId(newCollection.variations[0].versions[0].id);
-    }
-  }, []);
+  const handleCollectionSelect = useCallback(
+    (collectionId: string) => {
+      setSelectedCollectionId(collectionId);
+      const newCollection = promptCollections.find(
+        (c) => c.id.toString() === collectionId
+      );
+      if (newCollection) {
+        setSelectedVariationName(newCollection.variations[0].name);
+        setSelectedVersionId(newCollection.variations[0].versions[0].id);
+      }
+    },
+    [promptCollections]
+  );
 
   const handleVariationSelect = useCallback(
     (variationName: string) => {
@@ -73,6 +96,77 @@ export default function PromptBuilder() {
     },
     [selectedCollection]
   );
+
+  const handleCreateNewCollection = useCallback(() => {
+    if (newCollectionName && newCollectionIcon) {
+      const newCollection = {
+        id: promptCollections.length + 1,
+        name: newCollectionName,
+        icon: newCollectionIcon,
+        variations: [
+          {
+            name: "main",
+            versions: [
+              {
+                id: 1,
+                note: "Initial version",
+                prompt: "",
+                output: { type: "text", content: "" },
+                date: new Date().toISOString().split("T")[0],
+                promptTokens: 0,
+                outputTokens: 0,
+              },
+            ],
+          },
+        ],
+      };
+      setPromptCollections([...promptCollections, newCollection]);
+      setSelectedCollectionId(newCollection.id.toString());
+      setSelectedVariationName("main");
+      setSelectedVersionId(1);
+      setNewCollectionName("");
+      setNewCollectionIcon("");
+      setIsNewCollectionDialogOpen(false);
+    }
+  }, [newCollectionName, newCollectionIcon, promptCollections]);
+
+  const handleCreateNewVariation = useCallback(() => {
+    if (newVariationName && selectedCollection) {
+      const newVariation = {
+        name: newVariationName,
+        versions: [
+          {
+            id: 1,
+            note: "Initial version",
+            prompt: "",
+            output: { type: "text", content: "" },
+            date: new Date().toISOString().split("T")[0],
+            promptTokens: 0,
+            outputTokens: 0,
+          },
+        ],
+      };
+      const updatedCollections = promptCollections.map((collection) => {
+        if (collection.id.toString() === selectedCollectionId) {
+          return {
+            ...collection,
+            variations: [...collection.variations, newVariation],
+          };
+        }
+        return collection;
+      });
+      setPromptCollections(updatedCollections);
+      setSelectedVariationName(newVariationName);
+      setSelectedVersionId(1);
+      setNewVariationName("");
+      setIsNewVariationDialogOpen(false);
+    }
+  }, [
+    newVariationName,
+    selectedCollection,
+    selectedCollectionId,
+    promptCollections,
+  ]);
 
   if (!selectedCollection || !selectedVariation || !selectedVersion) {
     return <div>Loading...</div>;
@@ -131,18 +225,95 @@ export default function PromptBuilder() {
             </Select>
           </div>
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              className="bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
+            <Dialog
+              open={isNewCollectionDialogOpen}
+              onOpenChange={setIsNewCollectionDialogOpen}
             >
-              <Plus className="mr-2 h-4 w-4" /> New Collection
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
+                >
+                  <Plus className="mr-2 h-4 w-4" /> New Collection
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Collection</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for your new collection.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={newCollectionName}
+                      onChange={(e) => setNewCollectionName(e.target.value)}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="icon" className="text-right">
+                      Icon
+                    </Label>
+                    <Input
+                      id="icon"
+                      value={newCollectionIcon}
+                      onChange={(e) => setNewCollectionIcon(e.target.value)}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={handleCreateNewCollection}>
+                    Create Collection
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog
+              open={isNewVariationDialogOpen}
+              onOpenChange={setIsNewVariationDialogOpen}
             >
-              <Plus className="mr-2 h-4 w-4" /> New Variation
-            </Button>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+                >
+                  <Plus className="mr-2 h-4 w-4" /> New Variation
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Variation</DialogTitle>
+                  <DialogDescription>
+                    Enter the name for your new variation.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="variation-name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="variation-name"
+                      value={newVariationName}
+                      onChange={(e) => setNewVariationName(e.target.value)}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={handleCreateNewVariation}>
+                    Create Variation
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="outline"
               className="bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"
