@@ -17,9 +17,29 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ChevronRight, History, Plus, Save, Undo } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  ChevronRight,
+  History,
+  Plus,
+  Save,
+  Undo,
+  Calendar,
+  Edit3,
+  MessageSquare,
+  Image as ImageIcon,
+  Video,
+  Zap,
+} from "lucide-react";
 import { promptCollections as initialPromptCollections } from "@/data/promptData";
 import {
   Dialog,
@@ -369,12 +389,21 @@ export default function PromptBuilder() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <Button
-              variant="outline"
-              className="bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"
-            >
-              <Undo className="mr-2 h-4 w-4" /> Rollback
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"
+                  >
+                    <Undo className="mr-2 h-4 w-4" /> Rollback
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Revert to a previous version</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
@@ -382,7 +411,8 @@ export default function PromptBuilder() {
         <div className="flex-1 flex overflow-hidden bg-gray-50">
           {/* Version History */}
           <div className="w-1/4 p-4 border-r border-gray-200 bg-white overflow-auto">
-            <h2 className="text-lg font-semibold mb-4 text-gray-700">
+            <h2 className="text-lg font-semibold mb-4 text-gray-700 flex items-center">
+              <History className="mr-2 h-5 w-5" />
               Version History
             </h2>
             <ScrollArea className="h-[calc(100vh-16rem)]">
@@ -403,7 +433,8 @@ export default function PromptBuilder() {
                       <span className="font-medium text-gray-800">
                         V{version.id}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 flex items-center">
+                        <Calendar className="mr-1 h-3 w-3" />
                         {version.date}
                       </span>
                     </div>
@@ -417,16 +448,23 @@ export default function PromptBuilder() {
           {/* Prompt and Output */}
           <div className="flex-1 p-4 overflow-auto">
             <Card className="mb-4 shadow-md">
-              <CardHeader className="bg-gray-50 border-b border-gray-200">
-                <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight flex items-center">
-                  <History className="mr-2 h-5 w-5" />
-                  Prompt (Version {selectedVersion.id})
-                </CardTitle>
+              <CardHeader className="border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight flex items-center">
+                    <Edit3 className="mr-2 h-5 w-5" />
+                    Prompt (Version {selectedVersion.id})
+                  </CardTitle>
+                  <Badge variant="secondary" className="text-xs">
+                    <Calendar className="mr-1 h-3 w-3 inline" />
+                    {selectedVersion.date}
+                  </Badge>
+                </div>
                 <CardDescription>{selectedVersion.note}</CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="bg-gray-100 p-4 rounded-md mb-4">
-                  <h3 className="text-sm  font-semibold text-gray-700 mb-2">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <MessageSquare className="mr-2 h-4 w-4" />
                     Input Prompt:
                   </h3>
                   <Textarea
@@ -437,16 +475,16 @@ export default function PromptBuilder() {
                 </div>
                 <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
                   <div>
-                    <span className="font-medium">Date:</span>{" "}
-                    {selectedVersion.date}
-                  </div>
-                  <div>
-                    <span className="font-medium">Prompt Tokens:</span>{" "}
+                    <span className="font-medium flex items-center">
+                      <Zap className="mr-1 h-4 w-4" />
+                      Prompt Tokens:
+                    </span>{" "}
                     {selectedVersion.promptTokens}
                   </div>
                 </div>
-                <Separator className="my-4" />
-                <div className="flex justify-between">
+              </CardContent>
+              <CardFooter className="border-t border-gray-200 pt-4">
+                <div className="flex justify-between items-center w-full">
                   <Input
                     placeholder="Version note"
                     className="w-2/3 mr-2"
@@ -460,10 +498,10 @@ export default function PromptBuilder() {
                     <Save className="mr-2 h-4 w-4" /> Save New Version
                   </Button>
                 </div>
-              </CardContent>
+              </CardFooter>
             </Card>
             <Card className="shadow-md">
-              <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardHeader className="border-b border-gray-200">
                 <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight flex items-center">
                   <ChevronRight className="mr-2 h-5 w-5" />
                   Output
@@ -472,38 +510,56 @@ export default function PromptBuilder() {
               <CardContent className="pt-4">
                 <div className="bg-white border border-gray-200 rounded-md p-4 mb-4">
                   {selectedVersion.output.type === "text" && (
-                    <p className="text-gray-800 whitespace-pre-wrap">
-                      {selectedVersion.output.content}
-                    </p>
+                    <div className="flex items-start">
+                      <MessageSquare className="mr-2 h-5 w-5 text-gray-500 mt-1" />
+                      <p className="text-gray-800 whitespace-pre-wrap flex-grow">
+                        {selectedVersion.output.content}
+                      </p>
+                    </div>
                   )}
                   {selectedVersion.output.type === "image" && (
-                    <img
-                      src={selectedVersion.output.content}
-                      alt="Generated image"
-                      className="max-w-full h-auto rounded-md"
-                    />
+                    <div className="flex flex-col items-center">
+                      <ImageIcon className="mb-2 h-8 w-8 text-gray-500" />
+                      <img
+                        src={selectedVersion.output.content}
+                        alt="Generated image"
+                        className="max-w-full h-auto rounded-md"
+                      />
+                    </div>
                   )}
                   {selectedVersion.output.type === "video" && (
-                    <video controls className="w-full rounded-md">
-                      <source
-                        src={selectedVersion.output.content}
-                        type="video/mp4"
-                      />
-                      Your browser does not support the video tag.
-                    </video>
+                    <div className="flex flex-col items-center">
+                      <Video className="mb-2 h-8 w-8 text-gray-500" />
+                      <video controls className="w-full rounded-md">
+                        <source
+                          src={selectedVersion.output.content}
+                          type="video/mp4"
+                        />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
                   )}
                 </div>
                 <div className="flex justify-between items-center text-sm text-gray-600">
                   <div>
-                    <span className="font-medium">Output Type:</span>{" "}
+                    <span className="font-medium flex items-center">
+                      <Zap className="mr-1 h-4 w-4" />
+                      Output Type:
+                    </span>{" "}
                     {selectedVersion.output.type}
                   </div>
                   <div>
-                    <span className="font-medium">Output Tokens:</span>{" "}
+                    <span className="font-medium flex items-center">
+                      <Zap className="mr-1 h-4 w-4" />
+                      Output Tokens:
+                    </span>{" "}
                     {selectedVersion.outputTokens}
                   </div>
                   <div>
-                    <span className="font-medium">Total Tokens:</span>{" "}
+                    <span className="font-medium flex items-center">
+                      <Zap className="mr-1 h-4 w-4" />
+                      Total Tokens:
+                    </span>{" "}
                     {selectedVersion.promptTokens +
                       selectedVersion.outputTokens}
                   </div>
