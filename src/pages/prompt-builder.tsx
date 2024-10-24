@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,27 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  ChevronDown,
-  ChevronRight,
-  History,
-  Plus,
-  Save,
-  Undo,
-  Check,
-} from "lucide-react";
+import { ChevronRight, History, Plus, Save, Undo } from "lucide-react";
 
 // Dummy data structure for prompt collections
 const dummyPromptCollections = [
@@ -154,35 +134,62 @@ const dummyPromptCollections = [
 ];
 
 export default function PromptBuilder() {
-  const [selectedCollection, setSelectedCollection] = useState(
-    dummyPromptCollections[0]
+  const [selectedCollectionId, setSelectedCollectionId] = useState(
+    dummyPromptCollections[0].id.toString()
   );
-  const [selectedVariation, setSelectedVariation] = useState(
-    selectedCollection.variations[0]
+  const [selectedVariationName, setSelectedVariationName] = useState(
+    dummyPromptCollections[0].variations[0].name
   );
-  const [selectedVersion, setSelectedVersion] = useState(
-    selectedVariation.versions[selectedVariation.versions.length - 1]
+  const [selectedVersionId, setSelectedVersionId] = useState(
+    dummyPromptCollections[0].variations[0].versions[0].id
   );
-  const [open, setOpen] = useState(false);
 
-  const handleCollectionSelect = (collection) => {
-    setSelectedCollection(collection);
-    setSelectedVariation(collection.variations[0]);
-    setSelectedVersion(
-      collection.variations[0].versions[
-        collection.variations[0].versions.length - 1
-      ]
+  const selectedCollection = useMemo(
+    () =>
+      dummyPromptCollections.find(
+        (c) => c.id.toString() === selectedCollectionId
+      ),
+    [selectedCollectionId]
+  );
+  const selectedVariation = useMemo(
+    () =>
+      selectedCollection?.variations.find(
+        (v) => v.name === selectedVariationName
+      ),
+    [selectedCollection, selectedVariationName]
+  );
+  const selectedVersion = useMemo(
+    () => selectedVariation?.versions.find((v) => v.id === selectedVersionId),
+    [selectedVariation, selectedVersionId]
+  );
+
+  const handleCollectionSelect = useCallback((collectionId: string) => {
+    setSelectedCollectionId(collectionId);
+    const newCollection = dummyPromptCollections.find(
+      (c) => c.id.toString() === collectionId
     );
-  };
+    if (newCollection) {
+      setSelectedVariationName(newCollection.variations[0].name);
+      setSelectedVersionId(newCollection.variations[0].versions[0].id);
+    }
+  }, []);
 
-  const handleVariationSelect = (variation) => {
-    setSelectedVariation(variation);
-    setSelectedVersion(variation.versions[variation.versions.length - 1]);
-  };
+  const handleVariationSelect = useCallback(
+    (variationName: string) => {
+      setSelectedVariationName(variationName);
+      const newVariation = selectedCollection?.variations.find(
+        (v) => v.name === variationName
+      );
+      if (newVariation) {
+        setSelectedVersionId(newVariation.versions[0].id);
+      }
+    },
+    [selectedCollection]
+  );
 
-  const handleVersionSelect = (version) => {
-    setSelectedVersion(version);
-  };
+  if (!selectedCollection || !selectedVariation || !selectedVersion) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Layout>
@@ -190,57 +197,39 @@ export default function PromptBuilder() {
         {/* Top Bar */}
         <div className="p-4 border-b border-gray-200 bg-white shadow-sm flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className="w-[250px] justify-between"
-                >
-                  {selectedCollection.icon} {selectedCollection.name}
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[250px] p-0">
-                <Command>
-                  <CommandInput
-                    placeholder="Search collections..."
-                    className="h-9"
-                  />
-                  <CommandEmpty>No collection found.</CommandEmpty>
-                  <CommandGroup>
-                    {dummyPromptCollections.map((collection) => (
-                      <CommandItem
-                        key={collection.id}
-                        onSelect={() => {
-                          handleCollectionSelect(collection);
-                          setOpen(false);
-                        }}
-                        className="flex items-center"
-                      >
-                        <span className="mr-2">{collection.icon}</span>
-                        {collection.name}
-                        <Check
-                          className={`ml-auto h-4 w-4 ${
-                            selectedCollection.id === collection.id
-                              ? "opacity-100"
-                              : "opacity-0"
-                          }`}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
             <Select
-              value={selectedVariation.name}
-              onValueChange={(value) =>
-                handleVariationSelect(
-                  selectedCollection.variations.find((v) => v.name === value)
-                )
-              }
+              value={selectedCollectionId}
+              onValueChange={handleCollectionSelect}
+            >
+              <SelectTrigger className="w-[250px]">
+                <SelectValue placeholder="Select collection">
+                  {selectedCollection ? (
+                    <span className="flex items-center">
+                      <span className="mr-2">{selectedCollection.icon}</span>
+                      {selectedCollection.name}
+                    </span>
+                  ) : (
+                    "Select collection"
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {dummyPromptCollections.map((collection) => (
+                  <SelectItem
+                    key={collection.id}
+                    value={collection.id.toString()}
+                  >
+                    <span className="flex items-center">
+                      <span className="mr-2">{collection.icon}</span>
+                      {collection.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={selectedVariationName}
+              onValueChange={handleVariationSelect}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select variation" />
@@ -295,7 +284,7 @@ export default function PromptBuilder() {
                         ? "bg-blue-100 border-l-4 border-blue-500"
                         : "hover:bg-gray-100 border-l-4 border-transparent"
                     }`}
-                    onClick={() => handleVersionSelect(version)}
+                    onClick={() => setSelectedVersionId(version.id)}
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-gray-800">
