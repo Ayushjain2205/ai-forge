@@ -44,6 +44,14 @@ const dummyPromptCollections = [
             output:
               "In the heart of a vibrant metropolis, a determined young woman...",
           },
+          {
+            id: 3,
+            note: "Added conflict element",
+            prompt:
+              "Write an engaging story about {character} with {trait} facing {conflict} in {setting}",
+            output:
+              "The sun was setting over the ancient ruins when Sarah, a brilliant archaeologist with an insatiable curiosity, stumbled upon a mysterious artifact...",
+          },
         ],
       },
       {
@@ -56,7 +64,7 @@ const dummyPromptCollections = [
             output: "Once upon a time, in a bustling city...",
           },
           {
-            id: 3,
+            id: 2,
             note: "Added genre parameter",
             prompt: "Write a {genre} story about {character} in {setting}",
             output: "The neon-lit streets of Neo Tokyo buzzed with...",
@@ -161,90 +169,69 @@ export default function PromptBuilder() {
               </Button>
             </div>
           </div>
-          <div className="flex-1 flex">
-            <div className="w-1/2 p-4 border-r border-gray-200">
-              <Tabs defaultValue="edit" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="edit">Edit</TabsTrigger>
-                  <TabsTrigger value="history">History</TabsTrigger>
-                </TabsList>
-                <TabsContent value="edit">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-                        Prompt Editor
-                      </CardTitle>
-                      <CardDescription>
-                        Edit your prompt and save a new version
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea
-                        value={selectedVersion.prompt}
-                        onChange={() => {}}
-                        className="min-h-[200px] mb-4"
-                      />
-                      <Input placeholder="Version note" className="mb-4" />
-                      <Button className="w-full">
-                        <Save className="mr-2 h-4 w-4" /> Save New Version
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="history">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
-                        Version History
-                      </CardTitle>
-                      <CardDescription>
-                        View and select previous versions
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ScrollArea className="h-[300px]">
-                        {selectedVariation.versions
-                          .slice()
-                          .reverse()
-                          .map((version) => (
-                            <div
-                              key={version.id}
-                              className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                                selectedVersion.id === version.id
-                                  ? "bg-gray-200"
-                                  : ""
-                              }`}
-                              onClick={() => handleVersionSelect(version)}
-                            >
-                              <div className="flex items-center mb-2">
-                                <History className="mr-2 h-4 w-4" />
-                                <span className="font-medium">
-                                  Version {version.id}: {version.note}
-                                </span>
-                              </div>
-                              <div className="text-sm text-gray-600 mb-1">
-                                Prompt: {version.prompt}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                Output: {version.output.substring(0, 50)}...
-                              </div>
-                            </div>
-                          ))}
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+          <div className="flex-1 flex overflow-hidden">
+            {/* Version History */}
+            <div className="w-1/3 p-4 border-r border-gray-200 overflow-auto">
+              <h2 className="text-lg font-semibold mb-4">Version History</h2>
+              <ScrollArea className="h-[calc(100vh-16rem)]">
+                {selectedVariation.versions
+                  .slice()
+                  .reverse()
+                  .map((version) => (
+                    <Card
+                      key={version.id}
+                      className={`mb-4 cursor-pointer hover:bg-gray-100 ${
+                        selectedVersion.id === version.id
+                          ? "border-[#FF6B2C]"
+                          : ""
+                      }`}
+                      onClick={() => handleVersionSelect(version)}
+                    >
+                      <CardHeader>
+                        <CardTitle className="text-sm font-medium">
+                          Version {version.id}: {version.note}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-xs text-gray-600 mb-2">
+                          Prompt: {version.prompt.substring(0, 50)}...
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Output: {version.output.substring(0, 50)}...
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </ScrollArea>
             </div>
-            <div className="w-1/2 p-4">
+            {/* Prompt and Output */}
+            <div className="flex-1 p-4 overflow-auto">
+              <Card className="mb-4">
+                <CardHeader>
+                  <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
+                    Prompt (Version {selectedVersion.id})
+                  </CardTitle>
+                  <CardDescription>{selectedVersion.note}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={selectedVersion.prompt}
+                    onChange={() => {}}
+                    className="min-h-[100px] mb-4"
+                  />
+                  <div className="flex justify-between">
+                    <Input placeholder="Version note" className="w-2/3 mr-2" />
+                    <Button className="w-1/3">
+                      <Save className="mr-2 h-4 w-4" /> Save New Version
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
               <Card>
                 <CardHeader>
                   <CardTitle className="text-[#FF6B2C] text-lg font-semibold tracking-tight">
                     Output
                   </CardTitle>
-                  <CardDescription>
-                    View the generated output for this prompt version
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Textarea
