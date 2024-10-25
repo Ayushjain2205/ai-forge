@@ -11,7 +11,8 @@ export function Layout({ children }: LayoutProps) {
   const router = useRouter();
 
   const navItems = [
-    { name: "Prompt Builder", href: "/prompt-builder" },
+    { name: "Prompt Generator", href: "/prompt-generator" },
+    { name: "Prompt Manager", href: "/prompt-builder" },
     { name: "Pipelines", href: "/pipelines" },
     { name: "Templates", href: "/templates" },
   ];
