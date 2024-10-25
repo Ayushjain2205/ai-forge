@@ -1,56 +1,6 @@
-import React, { useCallback } from "react";
-import styled from "styled-components";
-
-const EditorContainer = styled.div`
-  position: relative;
-  text-align: left;
-  box-sizing: border-box;
-  padding: 0;
-  overflow: hidden;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
-  font-size: 12px;
-  line-height: 1.5;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-`;
-
-const EditorTextarea = styled.textarea`
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  resize: none;
-  color: inherit;
-  overflow: hidden;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-fill-color: transparent;
-  padding: 15px;
-  border: none;
-  background: none;
-  outline: none;
-  white-space: pre;
-  word-wrap: normal;
-  overflow-wrap: normal;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-`;
-
-const EditorPre = styled.pre`
-  margin: 0;
-  padding: 15px;
-  border: 0;
-  background: none;
-  white-space: pre;
-  word-wrap: normal;
-  overflow-wrap: normal;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-`;
+import React from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { tomorrow } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 interface CustomCodeEditorProps {
   value: string;
@@ -65,25 +15,29 @@ const CustomCodeEditor: React.FC<CustomCodeEditorProps> = ({
   placeholder,
   onChange,
 }) => {
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (onChange) {
-        onChange(event.target.value);
-      }
-    },
-    [onChange]
-  );
-
   return (
-    <EditorContainer>
-      <EditorTextarea
+    <div className="relative">
+      <SyntaxHighlighter
+        language={language}
+        style={tomorrow}
+        customStyle={{
+          margin: 0,
+          padding: "1rem",
+          fontSize: "0.875rem",
+          lineHeight: "1.5",
+          borderRadius: "0.375rem",
+        }}
+      >
+        {(value || placeholder || "").toString()}
+      </SyntaxHighlighter>
+      <textarea
         value={value}
-        onChange={handleChange}
+        onChange={(e) => onChange && onChange(e.target.value)}
         placeholder={placeholder}
-        spellCheck={false}
+        className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-gray-900 resize-none p-4 focus:outline-none"
+        spellCheck="false"
       />
-      <EditorPre aria-hidden="true">{value}</EditorPre>
-    </EditorContainer>
+    </div>
   );
 };
 

@@ -13,8 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import CustomCodeEditor from "@/components/CustomCodeEditor";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import { tomorrow } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import ReactMarkdown from "react-markdown";
 import copy from "copy-to-clipboard";
 import { Loader2, Copy, Check } from "lucide-react";
 
@@ -116,33 +114,20 @@ response = openai.Completion.create(
             </CardHeader>
             <CardContent>
               <div className="relative">
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <p className="mb-4">{children}</p>,
-                    code: ({ node, inline, className, children, ...props }) => {
-                      const match = /language-(\w+)/.exec(className || "");
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          style={tomorrow}
-                          language={match[1]}
-                          PreTag="div"
-                          {...props}
-                        >
-                          {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                      ) : (
-                        <code
-                          className="bg-muted px-1 py-0.5 rounded"
-                          {...props}
-                        >
-                          {children}
-                        </code>
-                      );
-                    },
-                  }}
-                >
-                  {generatedPrompt.replace(/\{([^}]+)\}/g, "`{$1}`")}
-                </ReactMarkdown>
+                <p className="mb-4 text-lg">
+                  {generatedPrompt.split("{").map((part, index) => {
+                    if (index === 0) return part;
+                    const [variable, rest] = part.split("}");
+                    return (
+                      <React.Fragment key={index}>
+                        <span className="bg-blue-100 px-1 rounded">
+                          {"{" + variable + "}"}
+                        </span>
+                        {rest}
+                      </React.Fragment>
+                    );
+                  })}
+                </p>
                 <Button
                   variant="outline"
                   size="sm"
