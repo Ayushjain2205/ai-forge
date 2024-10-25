@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import CustomCodeEditor from "@/components/CustomCodeEditor";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import copy from "copy-to-clipboard";
-import { Loader2, Copy, Check } from "lucide-react";
+import { Loader2, Copy, Check, WandSparkles } from "lucide-react";
 
 // Import languages you want to use
 import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
@@ -75,7 +75,7 @@ response = openai.Completion.create(
     <Layout>
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-8">Prompt Generator</h1>
-        <Card>
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle>What are you generating a prompt for?</CardTitle>
           </CardHeader>
@@ -90,30 +90,39 @@ response = openai.Completion.create(
                   onChange={(e) => setInput(e.target.value)}
                 />
               </div>
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !input}
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate Prompt"
-                )}
-              </Button>
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !input}
+                  className="bg-[#FF6B2C] hover:bg-[#E55A1B] text-white"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <WandSparkles className="mr-2 h-4 w-4" />
+                      Generate Prompt
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {generatedPrompt && (
-          <Card className="mt-8">
+          <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Generated Prompt</CardTitle>
+              <CardTitle className="text-[#FF6B2C] flex items-center">
+                <WandSparkles className="mr-2 h-5 w-5" />
+                Generated Prompt
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="relative">
+              <div className="relative bg-gray-100 p-4 rounded-md">
                 <p className="mb-4 text-lg">
                   {generatedPrompt.split("{").map((part, index) => {
                     if (index === 0) return part;
@@ -131,7 +140,7 @@ response = openai.Completion.create(
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute top-0 right-0"
+                  className="absolute top-2 right-2"
                   onClick={() => handleCopy(generatedPrompt)}
                 >
                   {copied ? (
@@ -146,13 +155,16 @@ response = openai.Completion.create(
         )}
 
         {generatedPrompt && (
-          <Card className="mt-8">
+          <Card>
             <CardHeader>
-              <CardTitle>Code Snippets</CardTitle>
+              <CardTitle className="text-[#FF6B2C] flex items-center">
+                <WandSparkles className="mr-2 h-5 w-5" />
+                Code Snippets
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList>
+                <TabsList className="mb-4">
                   <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                   <TabsTrigger value="python">Python</TabsTrigger>
                   <TabsTrigger value="bash">cURL</TabsTrigger>
@@ -180,15 +192,26 @@ response = openai.Completion.create(
                 </TabsContent>
               </Tabs>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex justify-end">
               <Button
                 onClick={() =>
                   handleCopy(
                     codeSnippets[activeTab as keyof typeof codeSnippets]
                   )
                 }
+                className="bg-[#FF6B2C] hover:bg-[#E55A1B] text-white"
               >
-                {copied ? "Copied!" : "Copy Code"}
+                {copied ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Code
+                  </>
+                )}
               </Button>
             </CardFooter>
           </Card>

@@ -16,7 +16,7 @@ const CustomCodeEditor: React.FC<CustomCodeEditorProps> = ({
   onChange,
 }) => {
   return (
-    <div className="relative">
+    <div className="relative rounded-md overflow-hidden">
       <SyntaxHighlighter
         language={language}
         style={tomorrow}
@@ -26,6 +26,7 @@ const CustomCodeEditor: React.FC<CustomCodeEditorProps> = ({
           fontSize: "0.875rem",
           lineHeight: "1.5",
           borderRadius: "0.375rem",
+          backgroundColor: "#f8f9fa",
         }}
       >
         {(value || placeholder || "").toString()}
