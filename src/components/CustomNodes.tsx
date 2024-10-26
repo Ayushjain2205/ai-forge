@@ -83,20 +83,30 @@ const createNodeComponent = (type: keyof typeof nodeTypes) => {
         textColor={textColor}
         icon={icon}
       >
-        <Handle type="target" position={Position.Top} />
-        <div className="space-y-2">
-          <Label htmlFor={`${type}-input`}>Input</Label>
-          <Input
-            id={`${type}-input`}
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              data.onChange({ input: e.target.value });
-            }}
-            placeholder={`Enter ${title.toLowerCase()} input...`}
+        <div className="relative">
+          <Handle
+            type="target"
+            position={Position.Left}
+            style={{ opacity: 0 }}
+          />
+          <div className="space-y-2">
+            <Label htmlFor={`${type}-input`}>Input</Label>
+            <Input
+              id={`${type}-input`}
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                data.onChange({ input: e.target.value });
+              }}
+              placeholder={`Enter ${title.toLowerCase()} input...`}
+            />
+          </div>
+          <Handle
+            type="source"
+            position={Position.Right}
+            style={{ opacity: 0 }}
           />
         </div>
-        <Handle type="source" position={Position.Bottom} />
       </NodeWrapper>
     );
   };

@@ -39,6 +39,26 @@ const NODE_HEIGHT = 150;
 const HORIZONTAL_SPACING = 20;
 const VERTICAL_SPACING = 20;
 
+// Custom edge style for dotted, animated, and lighter lines
+const customEdgeStyle = {
+  stroke: "#a0a0a0",
+  strokeWidth: 2,
+  strokeDasharray: "5, 5",
+  animation: "dashdraw 30s linear infinite",
+};
+
+// Add this CSS to your global styles or within a style tag in your component
+const globalStyles = `
+  @keyframes dashdraw {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 200;
+    }
+  }
+`;
+
 function Flow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -47,7 +67,10 @@ function Flow() {
   const [maxNodesPerRow, setMaxNodesPerRow] = useState(1);
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: any) =>
+      setEdges((eds) =>
+        addEdge({ ...params, style: customEdgeStyle, animated: true }, eds)
+      ),
     [setEdges]
   );
 
@@ -102,6 +125,8 @@ function Flow() {
         id: `e${nodeCount}-${nodeCount + 1}`,
         source: nodes[nodeCount - 1].id,
         target: newNode.id,
+        style: customEdgeStyle,
+        animated: true,
       };
       setEdges((eds) => eds.concat(newEdge));
     }
@@ -111,6 +136,7 @@ function Flow() {
 
   return (
     <div className="flex flex-col h-full">
+      <style>{globalStyles}</style>
       <div className="flex flex-wrap justify-around gap-2 m-4">
         <Button
           variant="outline"
@@ -179,6 +205,7 @@ function Flow() {
           nodesDraggable={true}
           nodesConnectable={true}
           elementsSelectable={true}
+          defaultEdgeOptions={{ style: customEdgeStyle, animated: true }}
         >
           <Background />
         </ReactFlow>
