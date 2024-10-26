@@ -113,46 +113,52 @@ function Flow() {
     <div className="flex flex-col h-full">
       <div className="flex flex-wrap gap-2 mb-4">
         <Button
+          variant="outline"
           onClick={() => addNode("textGeneration")}
-          className="bg-[#FF6B2C] hover:bg-[#E55A1B] text-white"
+          className="bg-orange-50 text-orange-600 hover:bg-orange-100 hover:text-orange-700"
         >
           <Type className="mr-2 h-4 w-4" />
-          Add Text Generation
+          Text Generation
         </Button>
         <Button
+          variant="outline"
           onClick={() => addNode("imageGeneration")}
-          className="bg-[#4CAF50] hover:bg-[#45a049] text-white"
+          className="bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
         >
           <Image className="mr-2 h-4 w-4" />
-          Add Image Generation
+          Image Generation
         </Button>
         <Button
+          variant="outline"
           onClick={() => addNode("videoGeneration")}
-          className="bg-[#2196F3] hover:bg-[#1e87db] text-white"
+          className="bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
         >
           <Video className="mr-2 h-4 w-4" />
-          Add Video Generation
+          Video Generation
         </Button>
         <Button
+          variant="outline"
           onClick={() => addNode("llmCall")}
-          className="bg-[#9C27B0] hover:bg-[#8e24aa] text-white"
+          className="bg-purple-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700"
         >
           <Brain className="mr-2 h-4 w-4" />
-          Add LLM Call
+          LLM Call
         </Button>
         <Button
+          variant="outline"
           onClick={() => addNode("functionCall")}
-          className="bg-[#FF9800] hover:bg-[#f57c00] text-white"
+          className="bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"
         >
           <Code className="mr-2 h-4 w-4" />
-          Add Function Call
+          Function Call
         </Button>
         <Button
+          variant="outline"
           onClick={() => addNode("apiCall")}
-          className="bg-[#607D8B] hover:bg-[#546e7a] text-white"
+          className="bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-700"
         >
           <Globe className="mr-2 h-4 w-4" />
-          Add API Call
+          API Call
         </Button>
       </div>
       <div ref={reactFlowWrapper} className="flex-grow">
