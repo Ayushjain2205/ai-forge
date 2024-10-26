@@ -111,7 +111,7 @@ function Flow() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap justify-around gap-2 m-4">
         <Button
           variant="outline"
           onClick={() => addNode("textGeneration")}
