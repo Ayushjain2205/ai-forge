@@ -14,7 +14,7 @@ export function Layout({ children }: LayoutProps) {
     { name: "Prompt Generator", href: "/prompt-generator" },
     { name: "Prompt Manager", href: "/prompt-builder" },
     { name: "Pipelines", href: "/pipelines" },
-    { name: "Templates", href: "/templates" },
+    { name: "Marketplace", href: "/marketplace" },
   ];
 
   return (
