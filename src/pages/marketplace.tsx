@@ -87,9 +87,9 @@ const items: Item[] = [
 ];
 
 const categoryStyles = {
-  prompt: "bg-orange-50 text-orange-600",
-  template: "bg-green-50 text-green-600",
-  pipeline: "bg-blue-50 text-blue-600",
+  prompt: "border-orange-200",
+  template: "border-green-200",
+  pipeline: "border-blue-200",
 };
 
 const categoryIcons = {
@@ -160,14 +160,16 @@ export default function Marketplace() {
           {filteredItems.map((item) => {
             const CategoryIcon = categoryIcons[item.category];
             return (
-              <Card key={item.id} className="overflow-hidden">
-                <div className={`h-2 ${categoryStyles[item.category]}`}></div>
+              <Card
+                key={item.id}
+                className={`overflow-hidden border-l-4 ${
+                  categoryStyles[item.category]
+                }`}
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{item.title}</span>
-                    <CategoryIcon
-                      className={`h-5 w-5 ${categoryStyles[item.category]}`}
-                    />
+                    <CategoryIcon className="h-5 w-5" />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
