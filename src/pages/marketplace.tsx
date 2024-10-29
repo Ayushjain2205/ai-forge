@@ -112,7 +112,10 @@ export default function Marketplace() {
   return (
     <Layout>
       <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">AI Forge Marketplace</h1>
+        <div className="flex flex-row items-center gap-4">
+          <img src="/marketplace.svg" alt="Logo" className="w-16 h-16 mb-4" />
+          <h1 className="text-3xl font-bold mb-8">Marketplace</h1>
+        </div>
         <div className="flex items-center space-x-4 mb-6">
           <div className="relative flex-grow">
             <Input

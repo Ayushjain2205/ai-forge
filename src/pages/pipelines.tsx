@@ -237,7 +237,10 @@ export default function Pipelines() {
   return (
     <Layout>
       <div className="flex flex-col h-[calc(100vh-4rem-64px)]">
-        <h1 className="text-3xl font-bold mb-4">AI Prompt Pipelines</h1>
+        <div className="flex flex-row items-center gap-4">
+          <img src="/pipeline.svg" alt="Logo" className="w-16 h-16 mb-4" />
+          <h1 className="text-3xl font-bold mb-8">Pipelines</h1>
+        </div>
         <div className="flex-grow border border-gray-300 rounded-md overflow-hidden">
           <ReactFlowProvider>
             <Flow />

@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import CustomCodeEditor from "@/components/CustomCodeEditor";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import copy from "copy-to-clipboard";
-import { Loader2, Copy, Check, WandSparkles } from "lucide-react";
+import { Loader2, Copy, Check, WandSparkles, Code } from "lucide-react";
 
 // Import languages you want to use
 import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
@@ -73,8 +73,15 @@ response = openai.Completion.create(
 
   return (
     <Layout>
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">Prompt Generator</h1>
+      <div className="container mx-auto">
+        <div className="flex flex-row items-center gap-4">
+          <img
+            src="/prompt-generator.svg"
+            alt="Logo"
+            className="w-16 h-16 mb-4"
+          />
+          <h1 className="text-3xl font-bold mb-8">Prompt Generator</h1>
+        </div>
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>What are you generating a prompt for?</CardTitle>
@@ -158,7 +165,7 @@ response = openai.Completion.create(
           <Card>
             <CardHeader>
               <CardTitle className="text-[#FF6B2C] flex items-center">
-                <WandSparkles className="mr-2 h-5 w-5" />
+                <Code className="mr-2 h-5 w-5" />
                 Code Snippets
               </CardTitle>
             </CardHeader>
