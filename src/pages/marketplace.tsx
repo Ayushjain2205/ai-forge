@@ -18,73 +18,7 @@ import {
   Star,
   Download,
 } from "lucide-react";
-
-type Item = {
-  id: string;
-  title: string;
-  description: string;
-  author: string;
-  category: "prompt" | "template" | "pipeline";
-  rating: number;
-  downloads: number;
-};
-
-const items: Item[] = [
-  {
-    id: "1",
-    title: "Creative Writing Prompt",
-    description: "A versatile prompt for creative writing exercises",
-    author: "Alice",
-    category: "prompt",
-    rating: 4.5,
-    downloads: 1200,
-  },
-  {
-    id: "2",
-    title: "SEO Content Template",
-    description: "Template for creating SEO-optimized blog posts",
-    author: "Bob",
-    category: "template",
-    rating: 4.2,
-    downloads: 980,
-  },
-  {
-    id: "3",
-    title: "Image to Video Pipeline",
-    description: "Convert still images into short video clips",
-    author: "Charlie",
-    category: "pipeline",
-    rating: 4.8,
-    downloads: 1500,
-  },
-  {
-    id: "4",
-    title: "Product Description Generator",
-    description: "AI-powered product description creator",
-    author: "David",
-    category: "prompt",
-    rating: 4.3,
-    downloads: 850,
-  },
-  {
-    id: "5",
-    title: "Social Media Content Calendar",
-    description: "Template for planning social media content",
-    author: "Eve",
-    category: "template",
-    rating: 4.6,
-    downloads: 1100,
-  },
-  {
-    id: "6",
-    title: "Text to Speech Pipeline",
-    description: "Convert written content into natural-sounding speech",
-    author: "Frank",
-    category: "pipeline",
-    rating: 4.7,
-    downloads: 1300,
-  },
-];
+import items from "@/data/marketPlaceData";
 
 const categoryStyles = {
   prompt: "border-orange-200",
