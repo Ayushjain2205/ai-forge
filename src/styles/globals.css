@@ -5,3 +5,7 @@
 body {
   font-family: "Open Sans", sans-serif;
 }
+
+.react-flow__attribution {
+  display: none;
+}

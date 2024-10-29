@@ -13,7 +13,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button } from "@/components/ui/button";
-import { Type, Image, Video, Brain, Code, Globe } from "lucide-react";
+import { Type, Image, Video, Brain, Code, Globe, Download } from "lucide-react";
 import {
   TextGenerationNode,
   ImageGenerationNode,
@@ -22,6 +22,7 @@ import {
   FunctionCallNode,
   APICallNode,
 } from "@/components/CustomNodes";
+import ExportModal from "@/components/ExportModal";
 
 const nodeTypes: NodeTypes = {
   textGeneration: TextGenerationNode,
@@ -65,6 +66,7 @@ function Flow() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { project, fitView } = useReactFlow();
   const [maxNodesPerRow, setMaxNodesPerRow] = useState(1);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const onConnect = useCallback(
     (params: any) =>
@@ -134,6 +136,10 @@ function Flow() {
     setTimeout(() => fitView({ padding: 0.2 }), 0);
   };
 
+  const handleExport = () => {
+    setIsExportModalOpen(true);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <style>{globalStyles}</style>
@@ -187,7 +193,7 @@ function Flow() {
           API Call
         </Button>
       </div>
-      <div ref={reactFlowWrapper} className="flex-grow">
+      <div ref={reactFlowWrapper} className="flex-grow relative">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -209,7 +215,20 @@ function Flow() {
         >
           <Background />
         </ReactFlow>
+        <Button
+          onClick={handleExport}
+          className="absolute bottom-4 right-4 bg-[#FF6B2C] hover:bg-[#E55A1B] text-white"
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Export Pipeline
+        </Button>
       </div>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        nodes={nodes}
+        edges={edges}
+      />
     </div>
   );
 }
