@@ -35,8 +35,8 @@ const nodeTypes: NodeTypes = {
 
 const initialNodes: Node[] = [];
 
-const NODE_WIDTH = 250;
-const NODE_HEIGHT = 150;
+const NODE_WIDTH = 300;
+const NODE_HEIGHT = 300;
 const HORIZONTAL_SPACING = 20;
 const VERTICAL_SPACING = 20;
 

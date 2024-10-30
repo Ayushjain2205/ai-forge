@@ -24,12 +24,17 @@ export type PromptVersion = {
     frequencyPenalty?: number;
     presencePenalty?: number;
     maxTokens?: number;
+    style?: string;
+    quality?: string;
+    resolution?: string;
+    sampleRate?: number;
+    bitRate?: number;
   };
   tags?: string[];
 };
 
 export type PromptVariation = {
-  name: string;
+  name: "Production" | "Testing";
   description?: string;
   versions: PromptVersion[];
 };
@@ -53,82 +58,61 @@ export type PromptCollection = {
 export const promptCollections: PromptCollection[] = [
   {
     id: 1,
-    name: "Advanced Code Generator",
+    name: "Enterprise Code Assistant",
     icon: "⚡",
     model: "GPT-4-Turbo",
-    description:
-      "Enterprise-grade code generation system with type safety and documentation",
+    description: "Enterprise-grade code and documentation generation system",
     createdDate: "2024-08-01",
     lastModified: "2024-10-08",
     author: "TechLead",
-    tags: ["development", "automation", "typescript"],
+    tags: ["development", "documentation", "enterprise"],
     isPublic: true,
     forkCount: 234,
     starCount: 1892,
     variations: [
       {
-        name: "main",
+        name: "Production",
         description: "Production-ready code generation",
         versions: [
           {
             id: 1,
-            note: "Initial TypeScript implementation",
+            note: "Full-stack component generator",
             prompt:
-              "Generate a {language} {componentType} that implements {interface} with {features}. Include proper error handling, logging, and unit tests. Follow {company} coding standards and use {framework} best practices.",
+              "Generate a {language} {componentType} with {features}. Include:\n- TypeScript interfaces\n- Error handling\n- Unit tests\n- API documentation\n- Logging integration\n- Performance monitoring\nFollow {company} standards and {framework} best practices.",
             output: {
               type: "code",
               content:
                 "export class UserService implements IUserService {\n  private logger: Logger;\n  // ... implementation\n}",
             },
-            date: "2024-08-01",
+            date: "2024-10-01",
             promptTokens: 45,
             outputTokens: 250,
             metadata: {
               temperature: 0.3,
               topP: 0.9,
-              frequencyPenalty: 0.2,
             },
             tags: ["typescript", "clean-code"],
-          },
-          {
-            id: 2,
-            note: "Added documentation generation",
-            prompt:
-              "Generate a {language} {componentType} that implements {interface} with {features}. Include proper error handling, logging, unit tests, and comprehensive documentation following {docStandard}. Implement monitoring hooks for {observabilityPlatform}.",
-            output: {
-              type: "code",
-              content:
-                "/**\n * @package UserService\n * @implements IUserService\n */\nexport class UserService implements IUserService {\n  // ... enhanced implementation\n}",
-            },
-            date: "2024-09-15",
-            promptTokens: 60,
-            outputTokens: 350,
-            metadata: {
-              temperature: 0.2,
-              topP: 0.95,
-            },
-            tags: ["documentation", "observability"],
           },
         ],
       },
       {
-        name: "experimental",
-        description: "Testing new patterns and features",
+        name: "Testing",
+        description: "Experimental features and patterns",
         versions: [
           {
             id: 1,
-            note: "Microservices architecture",
+            note: "AI-powered code review",
             prompt:
-              "Generate a microservice scaffold in {language} with {features} implementing {pattern}. Include service discovery, circuit breakers, and deployment manifests for {platform}.",
+              "Review this {language} code for:\n- Security vulnerabilities\n- Performance issues\n- Code smells\n- Architecture patterns\n- Test coverage\nProvide specific recommendations for {framework} best practices.",
             output: {
-              type: "code",
+              type: "markdown",
               content:
-                "// Microservice implementation with kubernetes manifests",
+                "## Code Review Summary\n\n### Security Issues Found\n...",
             },
-            date: "2024-10-01",
+            date: "2024-10-05",
             promptTokens: 55,
             outputTokens: 400,
-            tags: ["microservices", "kubernetes"],
+            tags: ["code-review", "security"],
           },
         ],
       },
@@ -136,40 +120,85 @@ export const promptCollections: PromptCollection[] = [
   },
   {
     id: 2,
-    name: "Data Pipeline Builder",
-    icon: "🔄",
-    model: "GPT-4-Turbo",
-    description:
-      "Enterprise data pipeline generation with validation and monitoring",
+    name: "Creative Image Generator",
+    icon: "🎨",
+    model: "DALL-E 3",
+    description: "Advanced image generation with style control and composition",
     createdDate: "2024-08-15",
     lastModified: "2024-10-07",
-    author: "DataArchitect",
-    tags: ["data-engineering", "etl", "analytics"],
+    author: "ArtDirector",
+    tags: ["image", "art", "design"],
     isPublic: true,
-    forkCount: 167,
-    starCount: 1243,
+    forkCount: 567,
+    starCount: 2341,
     variations: [
       {
-        name: "main",
-        description: "Production data pipelines",
+        name: "Production",
+        description: "Stable, tested image generation prompts",
         versions: [
           {
             id: 1,
-            note: "Data validation framework",
+            note: "Product visualization",
             prompt:
-              "Create a data pipeline that processes {dataType} from {source}, applies {transformations}, validates using {schema}, and loads to {destination}. Include error handling, retry logic, and data quality checks.",
+              "Create a {perspective} view of {product} in {style} style. Set in {environment} with {lighting} lighting. Include {features} and emphasize {focal_point}. Style reference: {reference_artist}. Additional details: {specific_requirements}",
             output: {
-              type: "code",
+              type: "image",
               content:
-                "from airflow import DAG\nfrom operators import *\n# Pipeline implementation",
+                "https://replicate.delivery/yhqm/albaypwzh46aJZfq0f9PwosJiPzHB3VAPjFDzik6SPbDEWpTA/R8_sd3.5L_00001_.webp",
             },
-            date: "2024-08-15",
-            promptTokens: 50,
-            outputTokens: 300,
+            date: "2024-09-15",
+            promptTokens: 60,
+            outputTokens: 0,
             metadata: {
-              temperature: 0.4,
-              maxTokens: 1000,
+              quality: "hd",
+              resolution: "1024x1024",
+              style: "product-photography",
             },
+            tags: ["product", "commercial"],
+          },
+          {
+            id: 2,
+            note: "Character design",
+            prompt:
+              "Generate a {shot_type} of a {character_type} wearing {outfit} in {art_style}. Character has {features} and expresses {emotion}. Setting: {environment} with {time_of_day} lighting. Include {props} and {background_elements}.",
+            output: {
+              type: "image",
+              content:
+                "https://replicate.delivery/yhqm/PMawGj2JwA58MpmZKkCNE4adlQfMLRJ0wZG6VH5JtY648q0JA/R8_sd3.5L_00001_.webp",
+            },
+            date: "2024-10-01",
+            promptTokens: 65,
+            outputTokens: 0,
+            metadata: {
+              quality: "ultimate",
+              resolution: "2048x2048",
+              style: "character-art",
+            },
+            tags: ["character", "illustration"],
+          },
+        ],
+      },
+      {
+        name: "Testing",
+        description: "Experimental image generation techniques",
+        versions: [
+          {
+            id: 1,
+            note: "Style fusion experiment",
+            prompt:
+              "Create a {subject} combining {style1} and {style2} artistic styles. Implement {technique} for texture. Use color palette inspired by {reference}. Apply {effect} effect at {intensity}% strength.",
+            output: {
+              type: "image",
+              content: "/style-fusion.png",
+            },
+            date: "2024-10-05",
+            promptTokens: 50,
+            outputTokens: 0,
+            metadata: {
+              quality: "development",
+              resolution: "1024x1024",
+            },
+            tags: ["experimental", "fusion"],
           },
         ],
       },
@@ -177,91 +206,84 @@ export const promptCollections: PromptCollection[] = [
   },
   {
     id: 3,
-    name: "System Design Document Generator",
-    icon: "📐",
-    model: "GPT-4-Turbo",
-    description:
-      "Automated generation of system design documents and architecture diagrams",
+    name: "Audio Production Suite",
+    icon: "🎵",
+    model: "AudioCraft",
+    description: "Professional audio generation and processing system",
     createdDate: "2024-09-01",
-    lastModified: "2024-10-05",
-    author: "SystemArchitect",
-    tags: ["architecture", "documentation", "diagrams"],
+    lastModified: "2024-10-08",
+    author: "SoundEngineer",
+    tags: ["audio", "music", "sound-effects"],
     isPublic: true,
-    forkCount: 89,
-    starCount: 567,
+    forkCount: 423,
+    starCount: 1756,
     variations: [
       {
-        name: "main",
-        description: "Enterprise architecture documentation",
+        name: "Production",
+        description: "Production-ready audio generation",
         versions: [
           {
             id: 1,
-            note: "Architecture Decision Records",
+            note: "Music composition",
             prompt:
-              "Generate an Architecture Decision Record (ADR) for implementing {feature} using {technology}. Include context, decision drivers, considered alternatives, consequences, and compliance with {standards}.",
+              "Compose a {genre} track with {tempo} BPM. Include:\n- Main melody: {melody_description}\n- Harmony: {chord_progression}\n- Rhythm: {rhythm_pattern}\n- Instruments: {instrument_list}\nMood: {emotional_quality}\nDuration: {length} seconds",
             output: {
-              type: "markdown",
-              content:
-                "# ADR-001: Implementation of Payment Gateway\n\n## Context\n\n## Decision\n\n## Consequences",
+              type: "audio",
+              content: "/composed-track.wav",
             },
-            date: "2024-09-01",
-            promptTokens: 40,
-            outputTokens: 200,
-            tags: ["adr", "documentation"],
+            date: "2024-09-20",
+            promptTokens: 70,
+            outputTokens: 0,
+            metadata: {
+              sampleRate: 48000,
+              bitRate: 320,
+              quality: "studio",
+            },
+            tags: ["music", "composition"],
           },
           {
             id: 2,
-            note: "Added sequence diagrams",
+            note: "Sound effect generation",
             prompt:
-              "Create a detailed system design document for {system} including sequence diagrams for {workflows}, component diagrams showing {components}, and deployment architecture for {environment}. Include security considerations and scaling strategy.",
+              "Generate a {effect_type} sound effect for {use_case}. Characteristics:\n- Duration: {length}s\n- Primary frequency range: {frequency_range}\n- Modulation: {modulation_type}\n- Space: {reverb_setting}\n- Dynamic range: {dynamics}",
             output: {
-              type: "markdown",
-              content:
-                "# System Design: Payment Processing Service\n\n```mermaid\nsequenceDiagram\n  participant User\n  participant PaymentService\n```",
+              type: "audio",
+              content: "/sound-effect.wav",
             },
-            date: "2024-10-05",
+            date: "2024-10-01",
             promptTokens: 55,
-            outputTokens: 400,
-            tags: ["diagrams", "architecture"],
+            outputTokens: 0,
+            metadata: {
+              sampleRate: 96000,
+              bitRate: 512,
+              quality: "cinematic",
+            },
+            tags: ["sfx", "sound-design"],
           },
         ],
       },
-    ],
-  },
-  {
-    id: 4,
-    name: "API Documentation Generator",
-    icon: "📚",
-    model: "GPT-4-Turbo",
-    description: "OpenAPI specification and documentation generator",
-    createdDate: "2024-09-15",
-    lastModified: "2024-10-08",
-    author: "APIDesigner",
-    tags: ["api", "documentation", "openapi"],
-    isPublic: true,
-    forkCount: 156,
-    starCount: 892,
-    variations: [
       {
-        name: "main",
-        description: "OpenAPI specification generation",
+        name: "Testing",
+        description: "Experimental audio generation",
         versions: [
           {
             id: 1,
-            note: "RESTful API documentation",
+            note: "AI voice synthesis",
             prompt:
-              "Generate OpenAPI 3.0 specification for a {serviceName} API with {endpoints}. Include authentication using {authMethod}, rate limiting details, and example responses for {scenarios}. Follow {standards} API design guidelines.",
+              "Synthesize {voice_type} voice speaking: {script}\nEmotion: {emotion}\nAccent: {accent}\nAge: {age}\nSpeaking style: {style}\nBackground ambiance: {ambient_setting}",
             output: {
-              type: "json",
-              content:
-                '{\n  "openapi": "3.0.0",\n  "info": {\n    "title": "Payment API",\n    "version": "1.0.0"\n  }\n}',
+              type: "audio",
+              content: "/synthesized-voice.wav",
             },
-            date: "2024-09-15",
-            promptTokens: 45,
-            outputTokens: 250,
+            date: "2024-10-05",
+            promptTokens: 60,
+            outputTokens: 0,
             metadata: {
-              temperature: 0.2,
+              sampleRate: 48000,
+              bitRate: 256,
+              quality: "broadcast",
             },
+            tags: ["voice", "synthesis"],
           },
         ],
       },

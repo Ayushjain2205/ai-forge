@@ -2,7 +2,15 @@ import React from "react";
 import { Handle, Position } from "reactflow";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Type, Image, Video, Brain, Code, Globe } from "lucide-react";
 
 const NodeWrapper = ({
@@ -18,7 +26,7 @@ const NodeWrapper = ({
   textColor: string;
   icon: React.ElementType;
 }) => (
-  <Card className="w-[250px] overflow-hidden">
+  <Card className="w-[290px] overflow-hidden">
     <CardHeader className={`py-2 px-3 ${bgColor}`}>
       <CardTitle
         className={`text-sm font-medium flex items-center ${textColor}`}
@@ -27,7 +35,7 @@ const NodeWrapper = ({
         {title}
       </CardTitle>
     </CardHeader>
-    <CardContent className="py-2">{children}</CardContent>
+    <CardContent className="py-2 px-2">{children}</CardContent>
   </Card>
 );
 
@@ -37,44 +45,63 @@ const nodeTypes = {
     bgColor: "bg-orange-50",
     textColor: "text-orange-600",
     icon: Type,
+    models: ["GPT-3", "GPT-4", "BERT", "T5"],
   },
   imageGeneration: {
     title: "Image Generation",
     bgColor: "bg-green-50",
     textColor: "text-green-600",
     icon: Image,
+    models: ["DALL-E", "Stable Diffusion", "Midjourney"],
   },
   videoGeneration: {
     title: "Video Generation",
     bgColor: "bg-blue-50",
     textColor: "text-blue-600",
     icon: Video,
+    models: ["Gen-1", "Gen-2", "Phenaki"],
   },
   llmCall: {
     title: "LLM Call",
     bgColor: "bg-purple-50",
     textColor: "text-purple-600",
     icon: Brain,
+    models: ["GPT-3", "GPT-4", "BERT", "T5"],
   },
   functionCall: {
     title: "Function Call",
     bgColor: "bg-amber-50",
     textColor: "text-amber-600",
     icon: Code,
+    models: ["Custom Function 1", "Custom Function 2", "Custom Function 3"],
   },
   apiCall: {
     title: "API Call",
     bgColor: "bg-gray-50",
     textColor: "text-gray-600",
     icon: Globe,
+    models: ["REST API", "GraphQL", "gRPC"],
   },
 };
 
 const createNodeComponent = (type: keyof typeof nodeTypes) => {
-  const { title, bgColor, textColor, icon } = nodeTypes[type];
+  const { title, bgColor, textColor, icon, models } = nodeTypes[type];
 
   return ({ data }: { data: any }) => {
     const [input, setInput] = React.useState(data.input || "");
+    const [negativePrompt, setNegativePrompt] = React.useState(
+      data.negativePrompt || ""
+    );
+    const [selectedModel, setSelectedModel] = React.useState(
+      data.model || models[0]
+    );
+
+    const handleChange = (field: string, value: string) => {
+      if (field === "input") setInput(value);
+      if (field === "negativePrompt") setNegativePrompt(value);
+      if (field === "model") setSelectedModel(value);
+      data.onChange({ [field]: value });
+    };
 
     return (
       <NodeWrapper
@@ -90,15 +117,44 @@ const createNodeComponent = (type: keyof typeof nodeTypes) => {
             style={{ opacity: 0 }}
           />
           <div className="space-y-2">
-            <Label htmlFor={`${type}-input`}>Input</Label>
-            <Input
+            <Label htmlFor={`${type}-model`} className="mt-4">
+              Model
+            </Label>
+            <Select
+              value={selectedModel}
+              onValueChange={(value) => handleChange("model", value)}
+            >
+              <SelectTrigger id={`${type}-model`}>
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent>
+                {models.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Label htmlFor={`${type}-input`} className="mt-4">
+              Prompt
+            </Label>
+            <Textarea
               id={`${type}-input`}
               value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                data.onChange({ input: e.target.value });
-              }}
+              onChange={(e) => handleChange("input", e.target.value)}
               placeholder={`Enter ${title.toLowerCase()} input...`}
+              rows={3}
+            />
+
+            <Label htmlFor={`${type}-negative-prompt`} className="mt-4">
+              Negative Prompt
+            </Label>
+            <Input
+              id={`${type}-negative-prompt`}
+              value={negativePrompt}
+              onChange={(e) => handleChange("negativePrompt", e.target.value)}
+              placeholder="Enter negative prompt..."
             />
           </div>
           <Handle
