@@ -45,14 +45,14 @@ const nodeTypes = {
     bgColor: "bg-orange-50",
     textColor: "text-orange-600",
     icon: Type,
-    models: ["GPT-3", "GPT-4", "BERT", "T5"],
+    models: ["GPT-4o", "Claude Sonnet 3.5", "Gemma 2.0", "Llama 3.1"],
   },
   imageGeneration: {
     title: "Image Generation",
     bgColor: "bg-green-50",
     textColor: "text-green-600",
     icon: Image,
-    models: ["DALL-E", "Stable Diffusion", "Midjourney"],
+    models: ["DALL-E", "Stable Diffusion", "Flux"],
   },
   videoGeneration: {
     title: "Video Generation",
